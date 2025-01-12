@@ -47,12 +47,17 @@ umap <- function(dataset, verbose = TRUE, normalise = TRUE, n_neighbors = 15, an
    cli::cli_alert_info("Running UMAP from [{ncol(dataset_numeric)}] numeric columns")
   }
 
+
   ## NORMALISE input data by default
   if(normalise){
     dataset_numeric_preprocessed <- as.data.frame(scale(dataset_numeric, center = TRUE, scale = TRUE))
+
+    ## Drop 0-variance columns (will have all values = NA)
+    dataset_numeric_preprocessed <- dataset_numeric_preprocessed[apply(dataset_numeric_preprocessed, MARGIN = 2, FUN = function(x){!all(is.na(x))})]
   }
   else
     dataset_numeric_preprocessed <- dataset_numeric
+
 
   # Run UMAP
   result <- uwot::umap(dataset_numeric_preprocessed, n_neighbors = n_neighbors, ...)
